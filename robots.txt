@@ -1,0 +1,3 @@
+# Preview copy — the real site will be indexed from Hostinger
+User-agent: *
+Disallow: /
