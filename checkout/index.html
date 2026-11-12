@@ -30,18 +30,58 @@
 <link rel="manifest" href="../manifest.webmanifest">
 
 <!-- Theme before paint (no flash) -->
-<script>(function(){try{var t=localStorage.getItem('dlk-theme');if(!t){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('dlk-theme');if(!t){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}document.documentElement.setAttribute('data-theme',t)}catch(e){}
+/* Intro loader: once per browser session */
+try{if(!sessionStorage.getItem('dlk-intro'))document.documentElement.classList.add('is-intro')}catch(e){document.documentElement.classList.add('is-intro')}})();</script>
 
 <!-- Fonts: Fraunces (display serif w/ italic), Cinzel (spaced caps, from the logo's "MBIRA MBERI"), Inter (UI/body) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="../assets/css/style.css?v=1794059570">
+<link rel="stylesheet" href="../assets/css/style.css?v=1794488521">
 <style>:root{--gold:#E8AA28}</style>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"MusicGroup","name":"De Lukes","alternateName":["Delukes","Luke Kamanga"],"url":"../","logo":"../assets/img/brand/logo-black.png","image":"../assets/img/brand/og-image.jpg","genre":["RnB","Afrofusion","Soul","Gospel"],"slogan":"Mbira Mberi","foundingLocation":{"@type":"Place","name":"Bulawayo, Zimbabwe"},"member":{"@type":"Person","name":"Luke Kamanga","alternateName":"De Lukes"},"sameAs":["https://open.spotify.com/artist/5VaD6cuOBKXYwJMRNiPUBL","https://www.instagram.com/de_lukes","https://www.facebook.com/share/1A2MPosChT/","https://www.tiktok.com/@delukesmbiramberi"],"contactPoint":{"@type":"ContactPoint","contactType":"booking","telephone":"+263 78 349 7827","email":"bookings@delukes.co.zw"}}</script>
 </head>
 <body data-page="checkout"><div class="preview-bar" style="background:#000;color:#fff;text-align:center;padding:8px 16px;font:500 12px/1.4 Inter,sans-serif;letter-spacing:.02em">Website preview — the live site will run on Hostinger. Forms &amp; payments are demo-only here. <a href="../admin/dashboard/" style="color:#E8AA28;display:inline-flex;align-items:center;gap:4px">See the admin panel <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M4 11h12.2l-5.6-5.6L12 4l8 8-8 8-1.4-1.4 5.6-5.6H4z"/></svg></a></div>
+
+<!-- ============ INTRO LOADER (first visit per session) ============
+     Tries to start the background music immediately; browsers that block
+     sound until a tap get the "Enter with sound" button, which starts it. -->
+<div class="loader" id="loader" role="dialog" aria-modal="true" aria-labelledby="loader-title" aria-describedby="loader-status">
+  <div class="loader__curtain loader__curtain--top" aria-hidden="true"></div>
+  <div class="loader__curtain loader__curtain--bottom" aria-hidden="true"></div>
+  <div class="loader__inner">
+    <div class="loader__photo" aria-hidden="true"><picture><source type="image/webp" srcset="../assets/img/photos/mbira-portrait-540.webp 540w, ../assets/img/photos/mbira-portrait-1080.webp 1080w" sizes="(min-width: 900px) 40vw, 90vw"><img src="../assets/img/photos/mbira-portrait-1080.jpg" srcset="../assets/img/photos/mbira-portrait-540.jpg 540w, ../assets/img/photos/mbira-portrait-1080.jpg 1080w" sizes="(min-width: 900px) 40vw, 90vw" width="1080" height="1198" alt="" class="" loading="eager" fetchpriority="high" decoding="async"></picture></div>
+    <div class="loader__glow" aria-hidden="true"></div>
+    <div class="loader__pattern loader__pattern--top" aria-hidden="true"></div>
+    <div class="loader__pattern loader__pattern--bottom" aria-hidden="true"></div>
+
+    <div class="loader__stage">
+      <div class="loader__rings" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <h2 class="loader__brand" id="loader-title">
+        <span class="sr-only">De Lukes — Mbira Mberi</span>
+        <img class="loader__logo" src="../assets/img/brand/logo-white.png?v=1794055519" alt="" width="520" height="287" fetchpriority="high">
+        <span class="loader__shine" aria-hidden="true" style="--logo:url('../assets/img/brand/logo-white.png?v=1794055519')"></span>
+      </h2>
+    </div>
+
+    <p class="loader__genres" aria-hidden="true"><span>RnB</span><span>Afrofusion</span><span>Soul</span><span>Gospel</span></p>
+
+    <div class="loader__meter" aria-hidden="true">
+      <div class="loader__eq"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="loader__bar"><i></i></div>
+      <div class="loader__readout"><span class="loader__msg">Tuning the mbira</span><span class="loader__pct">0%</span></div>
+    </div>
+
+    <div class="loader__actions">
+      <button type="button" class="btn btn--gold btn--lg loader__enter" data-loader-enter hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> <span>Enter with sound</span></button>
+      <button type="button" class="loader__silent" data-loader-silent hidden>Enter without sound</button>
+    </div>
+    <p class="loader__status" id="loader-status" aria-live="polite">Bulawayo · Zimbabwe</p>
+  </div>
+</div>
+
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="announce" id="announce" role="region" aria-label="Announcement">
@@ -95,7 +135,7 @@
         
     <div class="cart-layout">
       <form class="form-card" method="post" action="../checkout/" novalidate>
-        <input type="hidden" name="_csrf" value="503a5317fe685c7dca5469f4326c14954d2bb016231c2b86a62a4a3dbc041b7a"><input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="_csrf" value="128b8161394ce2d0202dbcdfd0cca108e60479512b174cf571c36426fc7f33a3"><input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <h2 class="h-section">Your details</h2>
         <div class="form-grid">
           <div class="field"><label for="c-name">Full name *</label><input id="c-name" name="name" required value="" autocomplete="name" ></div>
@@ -168,7 +208,7 @@
       <h2 class="footer-title">Join the fam</h2>
       <p class="muted">New music, shows and merch drops — straight to your inbox.</p>
       <form class="subscribe-form subscribe-form--compact" action="../subscribe/" method="post" data-ajax-form>
-        <input type="hidden" name="_csrf" value="503a5317fe685c7dca5469f4326c14954d2bb016231c2b86a62a4a3dbc041b7a"><input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="_csrf" value="128b8161394ce2d0202dbcdfd0cca108e60479512b174cf571c36426fc7f33a3"><input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="hidden" name="source" value="footer">
         <label class="sr-only" for="f-sub-email">Email address</label>
         <input id="f-sub-email" type="email" name="email" required placeholder="you@email.com" autocomplete="email">
@@ -250,7 +290,7 @@
 </section>
 
 <audio id="bg-audio" preload="none"></audio>
-<script id="site-config" type="application/json">{"static":true,"base":"../","csrf":"503a5317fe685c7dca5469f4326c14954d2bb016231c2b86a62a4a3dbc041b7a","bgMusic":[{"id":1,"title":"Nyengetera","artist":"De Lukes feat. Harvest Music ZW","cover":"../assets/img/covers/nyengetera-400.jpg","src":"../audio/nyengetera.mp3","lyrics":"../lyrics/nyengetera/","album":"../music/nyengetera/","hasLyrics":true},{"id":2,"title":"Vuubum","artist":"De Lukes feat. Mimie","cover":"../assets/img/covers/vuubum-400.jpg","src":"../audio/vuubum.mp3","lyrics":"../lyrics/vuubum/","album":"../music/vuubum/","hasLyrics":false}],"wa":"263783497827","waMessage":"Hi De Lukes! I found you on your website and would love to chat."}</script>
-<script src="../assets/js/app.js?v=1794059573" defer></script>
+<script id="site-config" type="application/json">{"static":true,"base":"../","csrf":"128b8161394ce2d0202dbcdfd0cca108e60479512b174cf571c36426fc7f33a3","bgMusic":[{"id":1,"title":"Nyengetera","artist":"De Lukes feat. Harvest Music ZW","cover":"../assets/img/covers/nyengetera-400.jpg","src":"../audio/nyengetera.mp3","lyrics":"../lyrics/nyengetera/","album":"../music/nyengetera/","hasLyrics":true},{"id":2,"title":"Vuubum","artist":"De Lukes feat. Mimie","cover":"../assets/img/covers/vuubum-400.jpg","src":"../audio/vuubum.mp3","lyrics":"../lyrics/vuubum/","album":"../music/vuubum/","hasLyrics":false}],"wa":"263783497827","waMessage":"Hi De Lukes! I found you on your website and would love to chat."}</script>
+<script src="../assets/js/app.js?v=1794488457" defer></script>
 <script>(function(){var root=new URL("../",location.href).href.replace(/\/$/,"");document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a[href*='__SITE__']");if(a)a.href=a.href.split("__SITE__").join(encodeURIComponent(root));},true);})();</script></body>
 </html>
