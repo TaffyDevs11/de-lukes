@@ -732,6 +732,111 @@ a.contact-card:hover { transform: translateX(6px); background: var(--gold); colo
 .is-loading::after { content: ""; position: fixed; top: 0; left: 0; height: 3px; z-index: 300; background: var(--gold); animation: loadbar 1s var(--ease) infinite; }
 @keyframes loadbar { from { width: 0; } to { width: 100%; } }
 
+/* ---------- 17. Intro loader ----------
+   Always black & gold (brand moment), shown once per session. */
+.loader { display: none; }
+.loader [hidden] { display: none !important; }
+.is-intro .loader {
+  display: flex; position: fixed; inset: 0; z-index: 1000; color: #fff;
+  animation: loader-failsafe 0s linear 14s forwards; /* hides itself if JS never runs */
+}
+.is-intro body { overflow: hidden; }
+@keyframes loader-failsafe { to { visibility: hidden; opacity: 0; pointer-events: none; } }
+.loader__curtain { position: absolute; left: 0; right: 0; height: 50.5%; background: #050505; transition: transform 1.1s cubic-bezier(.76,0,.24,1); }
+.loader__curtain--top { top: 0; }
+.loader__curtain--bottom { bottom: 0; }
+.loader__curtain::after { content: ""; position: absolute; left: 0; right: 0; height: 14px; background: var(--pattern-strip) repeat-x; background-size: auto 14px; opacity: 0; transition: opacity .3s; }
+.loader__curtain--top::after { bottom: 0; }
+.loader__curtain--bottom::after { top: 0; }
+.loader.is-leaving .loader__curtain::after { opacity: 1; }
+.loader.is-open .loader__curtain--top { transform: translateY(-101%); }
+.loader.is-open .loader__curtain--bottom { transform: translateY(101%); }
+
+.loader__inner { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(14px, 2.4vh, 26px); padding: 48px 16px; text-align: center; overflow: hidden; transition: opacity .5s ease, transform .6s var(--ease); }
+.loader.is-leaving .loader__inner { opacity: 0; transform: scale(1.04); }
+
+/* Artist photo, ghosted behind everything */
+.loader__photo { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; opacity: 0; animation: loader-photo 2.4s .2s var(--ease) forwards; pointer-events: none; }
+.loader__photo img { height: 100%; width: auto; max-width: none; object-fit: cover; filter: grayscale(1) contrast(1.1); mask-image: radial-gradient(ellipse 45% 55% at 50% 45%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 45% 55% at 50% 45%, #000 20%, transparent 75%); animation: kenburns 14s ease-out both; }
+@keyframes loader-photo { to { opacity: .3; } }
+.loader__glow { position: absolute; inset: 0; pointer-events: none; background:
+  radial-gradient(circle at 50% 42%, rgba(232,170,40,.28), transparent 38%),
+  radial-gradient(circle at 12% 88%, rgba(74,42,122,.55), transparent 45%),
+  radial-gradient(circle at 90% 10%, rgba(217,72,30,.28), transparent 40%); animation: loader-breathe 5s ease-in-out infinite alternate; }
+@keyframes loader-breathe { to { opacity: .65; transform: scale(1.06); } }
+
+/* Ndebele-inspired pattern bands sliding in from both sides */
+.loader__pattern { position: absolute; left: 0; right: 0; height: 22px; background: var(--pattern-strip) repeat-x; background-size: auto 22px; animation: loader-band 18s linear infinite; }
+.loader__pattern--top { top: 0; transform-origin: left; }
+.loader__pattern--bottom { bottom: 0; animation-direction: reverse; }
+@keyframes loader-band { from { background-position: 0 0; } to { background-position: 960px 0; } }
+
+/* Logo + sound-wave rings */
+.loader__stage { position: relative; display: grid; place-items: center; width: min(78vw, 440px); aspect-ratio: 1.6; }
+.loader__rings { position: absolute; inset: 0; display: grid; place-items: center; }
+.loader__rings span { position: absolute; width: 46%; aspect-ratio: 1; border: 2px solid var(--gold); border-radius: 50%; opacity: 0; animation: loader-ring 3.2s cubic-bezier(.2,.6,.3,1) infinite; }
+.loader__rings span:nth-child(2) { animation-delay: .8s; }
+.loader__rings span:nth-child(3) { animation-delay: 1.6s; }
+.loader__rings span:nth-child(4) { animation-delay: 2.4s; border-style: dashed; }
+@keyframes loader-ring { 0% { transform: scale(.4); opacity: .9; } 100% { transform: scale(2.4); opacity: 0; } }
+.loader__brand { position: relative; margin: 0; width: 100%; }
+.loader__logo { width: 100%; filter: drop-shadow(0 10px 40px rgba(0,0,0,.8)); clip-path: inset(100% 0 0 0); animation: loader-logo 1.5s .35s cubic-bezier(.65,0,.35,1) forwards, loader-pulse 2.6s 2s ease-in-out infinite; }
+@keyframes loader-logo {
+  0% { clip-path: inset(100% 0 0 0); transform: translateY(24px) scale(.96); filter: blur(10px) drop-shadow(0 10px 40px rgba(0,0,0,.8)); }
+  100% { clip-path: inset(0 0 0 0); transform: none; filter: blur(0) drop-shadow(0 10px 40px rgba(0,0,0,.8)); }
+}
+@keyframes loader-pulse { 50% { transform: scale(1.025); } }
+/* Gold light sweeping across the logo (masked to the logo shape) */
+.loader__shine { position: absolute; inset: 0; pointer-events: none;
+  -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,214,120,.95) 48%, #fff 50%, rgba(232,170,40,.9) 53%, transparent 66%) no-repeat;
+  background-size: 250% 100%; background-position: 130% 0; animation: loader-shine 3.2s 1.6s ease-in-out infinite; mix-blend-mode: screen; }
+@keyframes loader-shine { 0% { background-position: 130% 0; } 55%, 100% { background-position: -40% 0; } }
+
+/* Genres: one at a time, Cinzel spaced caps like "MBIRA MBERI" */
+.loader__genres { position: relative; height: 1.4em; width: 100%; margin: 0; font: 700 clamp(.85rem, .7rem + .6vw, 1.1rem)/1.4 var(--font-caps); letter-spacing: .5em; text-transform: uppercase; color: var(--gold); }
+.loader__genres span { position: absolute; inset: 0; opacity: 0; animation: loader-genre 6s linear infinite; padding-left: .5em; }
+.loader__genres span:nth-child(2) { animation-delay: 1.5s; }
+.loader__genres span:nth-child(3) { animation-delay: 3s; }
+.loader__genres span:nth-child(4) { animation-delay: 4.5s; }
+@keyframes loader-genre { 0% { opacity: 0; transform: translateY(10px); filter: blur(4px); } 6%, 22% { opacity: 1; transform: none; filter: none; } 28%, 100% { opacity: 0; transform: translateY(-10px); filter: blur(4px); } }
+
+/* Equaliser + progress */
+.loader__meter { width: min(320px, 80vw); display: grid; gap: 10px; transition: opacity .4s, transform .4s; }
+.loader.is-ready .loader__meter { opacity: 0; transform: translateY(-6px); height: 0; overflow: hidden; margin: -10px 0; }
+.loader__eq { display: flex; justify-content: center; align-items: flex-end; gap: 4px; height: 34px; }
+.loader__eq span { width: 4px; height: 20%; background: linear-gradient(to top, var(--gold), #fff3cf); border-radius: 2px; animation: eq 1.1s ease-in-out infinite; }
+.loader__eq span:nth-child(odd) { animation-duration: .9s; }
+.loader__eq span:nth-child(3n) { animation-delay: -.3s; }
+.loader__eq span:nth-child(4n) { animation-delay: -.6s; animation-duration: 1.3s; }
+.loader__eq span:nth-child(5n) { animation-delay: -.45s; }
+.loader__bar { height: 2px; background: rgba(255,255,255,.15); overflow: hidden; }
+.loader__bar i { display: block; height: 100%; width: 100%; background: var(--gold); transform-origin: left; transform: scaleX(0); }
+.loader__readout { display: flex; justify-content: space-between; font: 500 .72rem var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.loader__pct { font-variant-numeric: tabular-nums; color: #fff; }
+
+/* Enter */
+.loader__actions { display: grid; justify-items: center; gap: 10px; min-height: 0; }
+.loader__enter { animation: loader-in .7s var(--ease) both, loader-glow 2.2s 1s ease-in-out infinite; font-size: .9rem; }
+.loader__enter .icon { width: 1.3em; height: 1.3em; }
+@keyframes loader-in { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+@keyframes loader-glow { 50% { box-shadow: 0 0 0 10px rgba(232,170,40,.12), 0 0 40px rgba(232,170,40,.45); } }
+.loader__silent { background: none; border: 0; color: rgba(255,255,255,.65); font: 500 .8rem var(--font-body); text-decoration: underline; text-underline-offset: 3px; padding: 6px; animation: loader-in .7s .15s var(--ease) both; }
+.loader__silent:hover { color: #fff; }
+.loader__status { margin: 0; font: 600 .7rem var(--font-caps); letter-spacing: .4em; text-transform: uppercase; color: rgba(255,255,255,.55); min-height: 1.2em; }
+.loader__status.is-playing { color: var(--gold); }
+
+/* Hero waits for the curtain, then animates in */
+.js.is-intro .hero .reveal, .js.is-intro .hero .reveal.is-in { opacity: 0; transform: translate3d(0, 40px, 0); }
+
+@media (max-height: 560px) { .loader__stage { width: min(56vw, 300px); } .loader__photo { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .loader__curtain { transition: none; }
+  .loader__logo { clip-path: none; animation: none; }
+  .loader__shine, .loader__rings, .loader__pattern { animation: none; display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .js .reveal { opacity: 1; transform: none; }

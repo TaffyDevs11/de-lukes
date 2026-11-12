@@ -326,7 +326,7 @@
         else { this.userPaused = true; store.set('dlk-bg-off', '1'); this.audio.pause(); }
       });
       const kick = e => {
-        if (e.target.closest && e.target.closest('#bg-toggle, [data-play-track], #player')) return;
+        if (e.target.closest && e.target.closest('#bg-toggle, [data-play-track], #player, #loader')) return;
         ['pointerdown', 'keydown', 'touchstart'].forEach(ev => removeEventListener(ev, kick, true));
         if (!this.userPaused && P.audio.paused) this.play();
       };
@@ -610,9 +610,95 @@
     handle(esc(text).length ? text : '');
   });
 
+  /* ---------------- Intro loader ----------------
+     Shown once per session. Starts the background song immediately where the
+     browser allows it; otherwise "Enter with sound" (a real tap) starts it. */
+  const Loader = {
+    el: $('#loader'),
+    init() {
+      const el = this.el;
+      if (!el || !root.classList.contains('is-intro')) { if (el) el.remove(); root.classList.remove('is-intro'); return; }
+      el.style.animation = 'none';           // JS is running: cancel the CSS failsafe
+      smooth.stop();
+      this.pct = $('.loader__pct', el); this.bar = $('.loader__bar i', el); this.msg = $('.loader__msg', el);
+      this.status = $('.loader__status', el); this.enter = $('[data-loader-enter]', el); this.silent = $('[data-loader-silent]', el);
+      this.start = performance.now(); this.shown = 0; this.done = false;
+      this.loaded = document.readyState === 'complete';
+      addEventListener('load', () => { this.loaded = true; }, { once: true });
+
+      // 1) Try to autoplay right away (works where the browser permits sound without a tap)
+      const hasMusic = BG.list.length > 0;
+      const optedOut = store.get('dlk-bg-off') === '1';   // visitor switched music off before: respect it
+      if (hasMusic && !optedOut) {
+        BG.userPaused = false;
+        BG.audio.addEventListener('play', () => this.nowPlaying(), { once: true });
+        BG.play();
+      }
+      if (!hasMusic) $('span', this.enter).textContent = 'Enter';
+
+      this.enter.addEventListener('click', () => {
+        if (hasMusic) { BG.userPaused = false; store.set('dlk-bg-off', '0'); BG.play(); }   // 2) the tap guarantees sound
+        this.close();
+      });
+      this.silent.addEventListener('click', () => { BG.userPaused = true; BG.audio.pause(); this.close(); });
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && this.ready) this.silent.click();
+        if (e.key === 'Tab') { // keep focus inside the dialog
+          const f = [this.enter, this.silent].filter(b => !b.hidden);
+          if (!f.length) { e.preventDefault(); return; }
+          if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+          else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+        }
+      });
+      requestAnimationFrame(t => this.tick(t));
+    },
+    tick(now) {
+      if (this.done) return;
+      const t = now - this.start;
+      const MIN = reduceMotion ? 500 : 2600, MAX = 7000;   // always long enough to enjoy the logo reveal
+      const target = (this.loaded || t > MAX) ? 100 : Math.min(92, 92 * t / (t + 1600));
+      const capped = Math.min(target, 100 * t / MIN);
+      this.shown += (capped - this.shown) * 0.12;
+      if (capped >= 100 && this.shown > 99.4) this.shown = 100;
+      const p = Math.round(this.shown);
+      this.pct.textContent = p + '%';
+      this.bar.style.transform = 'scaleX(' + (this.shown / 100) + ')';
+      this.msg.textContent = p < 30 ? 'Tuning the mbira' : p < 60 ? 'Warming up the band' : p < 95 ? 'Lighting the stage' : 'Ready';
+      if (p >= 100) { this.setReady(); return; }
+      requestAnimationFrame(n => this.tick(n));
+    },
+    setReady() {
+      this.done = true; this.ready = true;
+      this.el.classList.add('is-ready');
+      this.enter.hidden = false; this.silent.hidden = false;
+      if (!BG.audio.paused) { $('span', this.enter).textContent = 'Enter'; this.silent.hidden = true; }
+      this.enter.focus({ preventScroll: true });
+    },
+    nowPlaying() {
+      const t = BG.list[BG.i];
+      this.status.textContent = 'Now playing · ' + (t ? t.title : 'De Lukes');
+      this.status.classList.add('is-playing');
+      if (this.ready) { $('span', this.enter).textContent = 'Enter'; this.silent.hidden = true; }
+    },
+    close() {
+      if (this.closing) return;
+      this.closing = true;
+      try { sessionStorage.setItem('dlk-intro', '1'); } catch (e) {}
+      const el = this.el;
+      el.classList.add('is-leaving');
+      setTimeout(() => {
+        el.classList.add('is-open');
+        root.classList.remove('is-intro');   // hero content animates in as the curtains part
+        smooth.start(); onScrollUI();
+      }, reduceMotion ? 0 : 450);
+      setTimeout(() => { el.remove(); const m = $('#main'); if (m) m.focus({ preventScroll: true }); }, reduceMotion ? 50 : 1700);
+    },
+  };
+
   /* ---------------- Boot ---------------- */
   P.init();
   BG.init();
+  Loader.init();
   onScrollUI();
   initPage();
 })();
